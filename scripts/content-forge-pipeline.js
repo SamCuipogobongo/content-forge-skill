@@ -70,12 +70,11 @@ async function runForge(keyword, platforms) {
 
   // Phase A+B: Collect and distill
   const result = forge.runForgePipeline(keyword, platforms, CONFIG);
-  console.log(`[forge-cli] Collected ${result.distilled.length} sources after distillation`);
-
-  if (result.distilled.length === 0) {
-    console.log("[forge-cli] No sources found. Exiting.");
+  if (!result || !result.distilled || result.distilled.length === 0) {
+    console.log("[forge-cli] No sources found after collection/distillation. Exiting.");
     return;
   }
+  console.log(`[forge-cli] Collected ${result.distilled.length} sources after distillation`);
 
   // Phase C: Run Claude to synthesize
   console.log("[forge-cli] Running Claude synthesis...");
@@ -103,7 +102,7 @@ function runClaude(prompt) {
     prompt,
   ], {
     cwd: projectRoot,
-    env: { ...process.env, HOME: process.env.HOME || "/Users/samcui233" },
+    env: { ...process.env },
     timeout: 300000, // 5 min
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
